@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MyTube</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <h1>MyTube</h1>
+  <input id="channel" placeholder="Channel name">
+  <input id="password" type="password" placeholder="Channel password">
+  <input type="file" id="file">
+  <button onclick="upload()">Upload</button>
+</header>
+
+<select id="filter" onchange="loadVideos()">
+  <option value="all">All Channels</option>
+</select>
+
+<main id="videos"></main>
+
+<script>
+async function upload() {
+  const channel = document.getElementById("channel").value;
+  const password = document.getElementById("password").value;
+  const file = document.getElementById("file").files[0];
+
+  if (!channel || !password || !file) {
+    return alert("Fill everything");
+  }
+
+  const data = new FormData();
+  data.append("video", file);
+  data.append("channel", channel);
+  data.append("password", password);
+
+  const res = await fetch("/upload", { method: "POST", body: data });
+  if (!res.ok) {
+    alert("Wrong password for channel");
+  }
+
+  loadChannels();
+  loadVideos();
+}
+
+async function loadChannels() {
+  const res = await fetch("/channels");
+  const channels = await res.json();
+  const filter = document.getElementById("filter");
+
+  filter.innerHTML = `<option value="all">All Channels</option>`;
+  channels.forEach(c => {
+    filter.innerHTML += `<option value="${c}">${c}</option>`;
+  });
+}
+
+async function loadVideos() {
+  const res = await fetch("/list");
+  const videos = await res.json();
+  const selected = document.getElementById("filter").value;
+  const container = document.getElementById("videos");
+
+  container.innerHTML = "";
+
+  videos
+    .filter(v => selected === "all" || v.channel === selected)
+    .forEach(v => {
+      container.innerHTML += `
+        <div class="card">
+          <h3>${v.channel}</h3>
+          <video controls src="/videos/${v.file}"></video>
+        </div>
+      `;
+    });
+}
+
+loadChannels();
+loadVideos();
+</script>
+
+</body>
+</html>

@@ -13,8 +13,6 @@ const VIDEO_FILE = "uploads/videos.json";
 // Make folders/files if they don't exist
 if (!fs.existsSync("uploads")) fs.mkdirSync("uploads");
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-if (!fs.existsSync(CHANNEL_FILE)) fs.writeFileSync(CHANNEL_FILE, "{}");
-if (!fs.existsSync(VIDEO_FILE)) fs.writeFileSync(VIDEO_FILE, "[]");
 
 const upload = multer({ dest: UPLOAD_DIR });
 
@@ -72,3 +70,7 @@ app.get("/channels", (req, res) => {
 app.listen(PORT, () => {
   console.log("Server running on port " + PORT);
 });
+if (!fs.existsSync(CHANNEL_FILE)) fs.writeFileSync(CHANNEL_FILE, "{}");
+if (!fs.existsSync(VIDEO_FILE)) fs.writeFileSync(VIDEO_FILE, "[]");
+
+
